@@ -52,8 +52,18 @@ exports.createNotificationOnLike = functions.firestore.document('likes/{id}')
             return db.doc(`/notifications/${snoapshot.id}`).set({
                 createdAt: new Date().toISOString(),
                 recipient: doc.date().userHandle,
-                sender: snoapshot.data
+                sender: snoapshot.data().userHandle,
+                type: 'like',
+                read: false,
+                screamId: doc.id
             })
         }
+    })
+    .then(() => {
+      return;
+    })
+    .catch(err => {
+      console.error(err);
+      return;
     })
 })
