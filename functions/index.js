@@ -60,7 +60,7 @@ exports.createNotificationOnLike = functions.firestore.document('likes/{id}')
         }
     })
     .then(() => {
-      return;
+      return; 
     })
     .catch(err => {
       console.error(err);
