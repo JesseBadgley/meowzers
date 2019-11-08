@@ -1,7 +1,7 @@
-const { db } = require("../util/admin");
+const { db } = require('../util/admin');
 
 exports.getAllMeows = (req, res) => {
-  db.collection("meows")
+  db.collection('meows')
 
     .get()
     .then((data) => {
@@ -23,10 +23,10 @@ exports.getAllMeows = (req, res) => {
 };
 
 exports.postOneMeow = (req, res) => {
-  if (req.body.body.trim() === "") {
+  if (req.body.body.trim() === '') {
     return res
       .status(400)
-      .json({ body: "Sorry kitty, the body must not be empty." });
+      .json({ body: 'Sorry kitty, the body must not be empty.' });
   }
 
   const newMeow = {
@@ -38,7 +38,7 @@ exports.postOneMeow = (req, res) => {
     commentCount: 0
   };
 
-  db.collection("meows")
+  db.collection('meows')
     .add(newMeow)
     .then((doc) => {
       const resMeow = newMeow;
@@ -48,7 +48,7 @@ exports.postOneMeow = (req, res) => {
     .catch((err) => {
       res
         .status(500)
-        .json({ error: "You have to be kitten me.. Something went wrong" });
+        .json({ error: 'You have to be kitten me.. Something went wrong' });
       console.error(err);
     });
 };
@@ -61,14 +61,14 @@ exports.getMeow = (req, res) => {
       if (!doc.exists) {
         return res
           .status(404)
-          .json({ error: "You have to be kitten me.. Meow not found." });
+          .json({ error: 'You have to be kitten me.. Meow not found.' });
       }
       meowData = doc.data();
       meowData.meowId = doc.id;
       return db
-        .collection("comments")
-        .orderBy("createdAt", "desc")
-        .where("meowId", "==", req.params.meowId)
+        .collection('comments')
+        .orderBy('createdAt', 'desc')
+        .where('meowId', '==', req.params.meowId)
         .get();
     })
     .then((data) => {
@@ -86,10 +86,10 @@ exports.getMeow = (req, res) => {
 
 // Comment on a meow
 exports.commentOnMeow = (req, res) => {
-  if (req.body.body.trim() === "")
+  if (req.body.body.trim() === '')
     return res
       .status(400)
-      .json({ error: "You have to be kitten me.. Must not be empty." });
+      .json({ error: 'You have to be kitten me.. Must not be empty.' });
 
   const newComment = {
     body: req.body.body,
@@ -103,35 +103,36 @@ exports.commentOnMeow = (req, res) => {
     .get()
     .then((doc) => {
       if (!doc.exists) {
+        ``;
         return res
           .status(400)
-          .json({ error: "You have to be kitten me.. Meow not found." });
+          .json({ error: 'You have to be kitten me.. Meow not found.' });
       }
       return doc.ref.update({ commentCount: doc.data().commentCount + 1 });
     })
     .then(() => {
-      return db.collection("comments").add(newComment);
+      return db.collection('comments').add(newComment);
     })
     .then(() => {
       res.json(newComment);
     })
     .catch((err) => {
       console.log(err);
-      res.status(500).json({ error: "Oops, something went wrong." });
+      res.status(500).json({ error: 'Oops, something went wrong.' });
     });
 };
 
 // Like a meow
 exports.likeMeow = (req, res) => {
   const likeDocument = db
-    .collection("likes")
-    .where("userHandle", "==", req.user.handle)
-    .where("meowId", "==", req.params.meowId)
+    .collection('likes')
+    .where('userHandle', '==', req.user.handle)
+    .where('meowId', '==', req.params.meowId)
     .limit(1);
 
   const meowDocument = db.doc(`/meows/${req.params.meowId}`);
 
-  let moewData = {};
+  let meowData = {};
 
   meowDocument
     .get()
@@ -143,13 +144,13 @@ exports.likeMeow = (req, res) => {
       } else {
         return res
           .status(404)
-          .json({ error: "You have to be kitten me.. Meow not found." });
+          .json({ error: 'You have to be kitten me.. Meow not found.' });
       }
     })
     .then((data) => {
       if (data.empty) {
         return db
-          .collection("likes")
+          .collection('likes')
           .add({
             meowId: req.params.meowId,
             userHandle: req.user.handle
@@ -164,7 +165,7 @@ exports.likeMeow = (req, res) => {
       } else {
         return res
           .status(400)
-          .json({ error: "You have to be kitten me.. Meow already liked." });
+          .json({ error: 'You have to be kitten me.. Meow already liked.' });
       }
     })
     .catch((err) => {
@@ -175,14 +176,14 @@ exports.likeMeow = (req, res) => {
 // Unlike meow
 exports.unlikeMeow = (req, res) => {
   const likeDocument = db
-    .collection("likes")
-    .where("userHandle", "==", req.user.handle)
-    .where("meowId", "==", req.params.meowId)
+    .collection('likes')
+    .where('userHandle', '==', req.user.handle)
+    .where('meowId', '==', req.params.meowId)
     .limit(1);
 
   const meowDocument = db.doc(`/meows/${req.params.meowId}`);
 
-  let moewData = {};
+  let meowData = {};
 
   meowDocument
     .get()
@@ -194,14 +195,14 @@ exports.unlikeMeow = (req, res) => {
       } else {
         return res
           .status(404)
-          .json({ error: "You have to be kitten me.. Meow not found." });
+          .json({ error: 'You have to be kitten me.. Meow not found.' });
       }
     })
     .then((data) => {
       if (data.empty) {
         return res
           .status(400)
-          .json({ error: "You have to be kitten me.. Meow not liked." });
+          .json({ error: 'You have to be kitten me.. Meow not liked.' });
       } else {
         return db
           .doc(`/likes/${data.docs[0].id}`)
@@ -229,18 +230,18 @@ exports.deleteMeow = (req, res) => {
       if (!doc.exists) {
         return res
           .status(404)
-          .json({ error: "You have to be kitten me.. Meow not found." });
+          .json({ error: 'You have to be kitten me.. Meow not found.' });
       }
       if (doc.data().userHandle !== req.user.handle) {
         return res
           .status(403)
-          .json({ error: "No kitty! That is unauthorized." });
+          .json({ error: 'No kitty! That is unauthorized.' });
       } else {
         return document.delete();
       }
     })
     .then(() => {
-      res.json({ message: "Meow deleted successfully." });
+      res.json({ message: 'Meow deleted successfully.' });
     })
     .catch((err) => {
       console.error(err);
