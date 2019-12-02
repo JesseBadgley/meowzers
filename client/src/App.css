@@ -4,6 +4,7 @@ body {
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   background-color: rgb(245, 245, 245);
+  background-image: ;
 }
 
 .container {
@@ -14,7 +15,17 @@ body {
 .nav-container {
   margin: auto;
 }
+.nav-container svg {
+  color: #fff;
+}
+/* .kittyImgHome {
+  justify-content: left;
+} */
 
 a {
   text-decoration: none;
+}
+
+.edit-button {
+  margin: 20px;
 }
