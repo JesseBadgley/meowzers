@@ -1,15 +1,15 @@
-const { admin, db } = require("../util/admin");
+const { admin, db } = require('../util/admin');
 
-const config = require("../util/config");
+const config = require('../util/config');
 
-const firebase = require("firebase");
+const firebase = require('firebase');
 firebase.initializeApp(config);
 
 const {
   validateSignupData,
   validateLoginData,
   reduceUserDetails
-} = require("../util/validators");
+} = require('../util/validators');
 
 // Sign users up
 exports.signup = (req, res) => {
@@ -20,18 +20,18 @@ exports.signup = (req, res) => {
     handle: req.body.handle
   };
 
-  // const { valid, errors } = validateSignupData(newUser);
+  const { valid, errors } = validateSignupData(newUser);
 
-  // if (!valid) return res.status(400).json(errors);
+  if (!valid) return res.status(400).json(errors);
 
-  const noImg = "no-img.png";
+  const noImg = 'no-img.png';
 
   let token, userId;
   db.doc(`/users/${newUser.handle}`)
     .get()
     .then((doc) => {
       if (doc.exists) {
-        return res.status(400).json({ handle: "this handle is already taken" });
+        return res.status(400).json({ handle: 'this handle is already taken' });
       } else {
         return firebase
           .auth()
@@ -58,12 +58,12 @@ exports.signup = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.code === "auth/email-already-in-use") {
-        return res.status(400).json({ email: "Email is already is use" });
+      if (err.code === 'auth/email-already-in-use') {
+        return res.status(400).json({ email: 'Email is already is use' });
       } else {
         return res
           .status(500)
-          .json({ general: "Something went wrong, please try again" });
+          .json({ general: 'Something went wrong, please try again' });
       }
     });
 };
@@ -74,9 +74,9 @@ exports.login = (req, res) => {
     password: req.body.password
   };
 
-  // const { valid, errors } = validateLoginData(user);
+  const { valid, errors } = validateLoginData(user);
 
-  // if (!valid) return res.status(400).json(errors);
+  if (!valid) return res.status(400).json(errors);
 
   firebase
     .auth()
@@ -93,7 +93,7 @@ exports.login = (req, res) => {
       // auth/user-not-user
       return res
         .status(403)
-        .json({ general: "Wrong credentials, please try again" });
+        .json({ general: 'Wrong credentials, please try again' });
     });
 };
 
@@ -104,7 +104,7 @@ exports.addUserDetails = (req, res) => {
   db.doc(`/users/${req.user.handle}`)
     .update(userDetails)
     .then(() => {
-      return res.json({ message: "Details added successfully" });
+      return res.json({ message: 'Details added successfully' });
     })
     .catch((err) => {
       console.error(err);
@@ -120,25 +120,25 @@ exports.getUserDetails = (req, res) => {
       if (doc.exists) {
         userData.user = doc.data();
         return db
-          .collection("screams")
-          .where("userHandle", "==", req.params.handle)
-          .orderBy("createdAt", "desc")
+          .collection('meows')
+          .where('userHandle', '==', req.params.handle)
+          .orderBy('createdAt', 'desc')
           .get();
       } else {
-        return res.status(404).json({ errror: "User not found" });
+        return res.status(404).json({ errror: 'User not found' });
       }
     })
     .then((data) => {
-      userData.screams = [];
+      userData.meows = [];
       data.forEach((doc) => {
-        userData.screams.push({
+        userData.meows.push({
           body: doc.data().body,
           createdAt: doc.data().createdAt,
           userHandle: doc.data().userHandle,
           userImage: doc.data().userImage,
           likeCount: doc.data().likeCount,
           commentCount: doc.data().commentCount,
-          screamId: doc.id
+          meowId: doc.id
         });
       });
       return res.json(userData);
@@ -157,8 +157,8 @@ exports.getAuthenticatedUser = (req, res) => {
       if (doc.exists) {
         userData.credentials = doc.data();
         return db
-          .collection("likes")
-          .where("userHandle", "==", req.user.handle)
+          .collection('likes')
+          .where('userHandle', '==', req.user.handle)
           .get();
       }
     })
@@ -168,9 +168,9 @@ exports.getAuthenticatedUser = (req, res) => {
         userData.likes.push(doc.data());
       });
       return db
-        .collection("notifications")
-        .where("recipient", "==", req.user.handle)
-        .orderBy("createdAt", "desc")
+        .collection('notifications')
+        .where('recipient', '==', req.user.handle)
+        .orderBy('createdAt', 'desc')
         .limit(10)
         .get();
     })
@@ -194,25 +194,26 @@ exports.getAuthenticatedUser = (req, res) => {
       return res.status(500).json({ error: err.code });
     });
 };
+
 // Upload a profile image for user
 exports.uploadImage = (req, res) => {
-  const BusBoy = require("busboy");
-  const path = require("path");
-  const os = require("os");
-  const fs = require("fs");
+  const BusBoy = require('busboy');
+  const path = require('path');
+  const os = require('os');
+  const fs = require('fs');
 
   const busboy = new BusBoy({ headers: req.headers });
 
   let imageToBeUploaded = {};
   let imageFileName;
 
-  busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
+  busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
     console.log(fieldname, file, filename, encoding, mimetype);
-    if (mimetype !== "image/jpeg" && mimetype !== "image/png") {
-      return res.status(400).json({ error: "Wrong file type submitted" });
+    if (mimetype !== 'image/jpeg' && mimetype !== 'image/png') {
+      return res.status(400).json({ error: 'Wrong file type submitted' });
     }
     // my.image.png => ['my', 'image', 'png']
-    const imageExtension = filename.split(".")[filename.split(".").length - 1];
+    const imageExtension = filename.split('.')[filename.split('.').length - 1];
     // 32756238461724837.png
     imageFileName = `${Math.round(
       Math.random() * 1000000000000
@@ -221,7 +222,7 @@ exports.uploadImage = (req, res) => {
     imageToBeUploaded = { filepath, mimetype };
     file.pipe(fs.createWriteStream(filepath));
   });
-  busboy.on("finish", () => {
+  busboy.on('finish', () => {
     admin
       .storage()
       .bucket()
@@ -238,11 +239,11 @@ exports.uploadImage = (req, res) => {
         return db.doc(`/users/${req.user.handle}`).update({ imageUrl });
       })
       .then(() => {
-        return res.json({ message: "image uploaded successfully" });
+        return res.json({ message: 'image uploaded successfully' });
       })
       .catch((err) => {
         console.error(err);
-        return res.status(500).json({ error: "something went wrong" });
+        return res.status(500).json({ error: 'something went wrong' });
       });
   });
   busboy.end(req.rawBody);
@@ -257,7 +258,7 @@ exports.markNotificationsRead = (req, res) => {
   batch
     .commit()
     .then(() => {
-      return res.json({ message: "Notifications marked read" });
+      return res.json({ message: 'Notifications marked read' });
     })
     .catch((err) => {
       console.error(err);
