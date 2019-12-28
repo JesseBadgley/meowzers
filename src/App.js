@@ -38,6 +38,8 @@ if (token) {
 	}
 }
 
+// const theme = createMuiTheme(themeObject);
+
 const theme = createMuiTheme({
 	palette: {
 		primary: {
